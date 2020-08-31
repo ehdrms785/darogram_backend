@@ -1,9 +1,13 @@
 type User {
   id: ID!
+  avatar: String
   username: String!
   email: String!
   firstName: String
   lastName: String
+  fullName: String
+  isFollowing: Boolean!
+  isSelf: Boolean!
   bio: String
   following: [User!]!
   followers: [User!]!
@@ -11,6 +15,9 @@ type User {
   likes: [Like!]!
   comments: [Comment!]!
   rooms: [ChatRoom!]!
+  loginSecret: String!
+  createdAt: String
+  updatedAt: String
 }
 
 type Post {
@@ -21,12 +28,18 @@ type Post {
   files: [File!]!
   likes: [Like!]!
   comments: [Comment!]!
+  isLiked: Boolean!
+  likeCount: Int!
+  createdAt: String
+  updatedAt: String
 }
 
 type Like {
   id: ID!
   user: User!
   post: Post!
+  createdAt: String
+  updatedAt: String
 }
 
 type Comment {
@@ -34,18 +47,24 @@ type Comment {
   text: String!
   user: User!
   post: Post!
+  createdAt: String
+  updatedAt: String
 }
 
 type File {
   id: ID!
   url: String!
   post: Post!
+  createdAt: String
+  updatedAt: String
 }
 
 type ChatRoom {
   id: ID!
   participants: [User!]!
   messages: [Message!]!
+  createdAt: String
+  updatedAt: String
 }
 
 type Message {
@@ -54,4 +73,11 @@ type Message {
   from: User!
   to: User!
   room: ChatRoom!
+  createdAt: String
+  updatedAt: String
+}
+
+type UserProfile {
+  user: User!
+  posts: [Post!]!
 }
