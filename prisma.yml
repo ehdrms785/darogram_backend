@@ -1,4 +1,5 @@
 endpoint: https://us1.prisma.sh/ehdrms785-ea1361/prismagram/dev
+
 datamodel: datamodel.prisma
 
 generate:

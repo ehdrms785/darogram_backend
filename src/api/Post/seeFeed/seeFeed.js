@@ -5,6 +5,7 @@ export default {
     seeFeed: async (_, __, { request, isAuthenticated }) => {
       isAuthenticated(request);
       const { user } = request;
+      console.log(user);
       const following = await prisma.user({ id: user.id }).following();
       return prisma.posts({
         where: {

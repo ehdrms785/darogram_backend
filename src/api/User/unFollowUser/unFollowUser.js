@@ -4,7 +4,7 @@ export default {
   Mutation: {
     unFollowUser: async (_, args, { request, isAuthenticated }) => {
       isAuthenticated(request);
-      const { targetUnfollowId } = args;
+      const { id } = args;
       const { user } = request;
       try {
         await prisma.updateUser({
@@ -12,7 +12,7 @@ export default {
           data: {
             following: {
               disconnect: {
-                id: targetUnfollowId,
+                id,
               },
             },
           },

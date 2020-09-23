@@ -11,21 +11,27 @@ export default {
     fullName: (parent) => {
       return `${parent.firstName} ${parent.lastName}`;
     },
-    // postsCount: ({ id }) =>
-    //   prisma
-    //     .postsConnection({ where: { user: { id } } })
-    //     .aggregate()
-    //     .count(),
-    // followingCount: ({ id }) =>
-    //   prisma
-    //     .usersConnection({ where: { followers_some: { id } } })
-    //     .aggregate()
-    //     .count(),
-    // followersCount: ({ id }) =>
-    //   prisma
-    //     .usersConnection({ where: { following_none: { id } } })
-    //     .aggregate()
-    //     .count(),
+    postsCount: ({ id }) =>
+      prisma
+        .postsConnection({
+          where: { user: { id } },
+        })
+        .aggregate()
+        .count(),
+    followingCount: ({ id }) =>
+      prisma
+        .usersConnection({
+          where: { followers_some: { id } },
+        })
+        .aggregate()
+        .count(),
+    followersCount: ({ id }) =>
+      prisma
+        .usersConnection({
+          where: { followers_some: { id } },
+        })
+        .aggregate()
+        .count(),
     isFollowing: (parent, _, { request }) => {
       const { user } = request; // request (me)
       const { id: parentId } = parent; // ask (SeeUser(id: "id")) 값의 id

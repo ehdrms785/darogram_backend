@@ -4,7 +4,7 @@ export default {
   Mutation: {
     followUser: async (_, args, { request, isAuthenticated }) => {
       isAuthenticated(request);
-      const { targetFollowId } = args;
+      const { id } = args;
       const { user } = request;
       try {
         await prisma.updateUser({
@@ -14,7 +14,7 @@ export default {
           data: {
             following: {
               connect: {
-                id: targetFollowId,
+                id,
               },
             },
           },

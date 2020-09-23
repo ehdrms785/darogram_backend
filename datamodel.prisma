@@ -1,6 +1,6 @@
 type User {
   id: ID! @id @unique
-  avatar: String
+  avatar: String @default(value: "https://cdns.iconmonstr.com/wp-content/assets/preview/2017/240/iconmonstr-accessibility-3.png")
   username: String! @unique
   email: String! @unique
   firstName: String @default(value: "")
