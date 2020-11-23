@@ -51,6 +51,16 @@ type Comment {
   text: String!
   user: User!
   post: Post!
+  reply: [Recomment]
+  createdAt: String
+  updatedAt: String
+}
+
+type Recomment {
+  id: ID!
+  text: String!
+  user: User!
+  parentComment: Comment!
   createdAt: String
   updatedAt: String
 }

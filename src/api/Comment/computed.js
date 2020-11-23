@@ -4,5 +4,10 @@ export default {
   Comment: {
     user: ({ id }) => prisma.comment({ id }).user(),
     post: ({ id }) => prisma.comment({ id }).post(),
+    reply: ({ id }) => prisma.comment({ id }).reply(),
+  },
+  Recomment: {
+    user: ({ id }) => prisma.recomment({ id }).user(),
+    parentComment: ({ id }) => prisma.recomment({ id }).parentComment(),
   },
 };

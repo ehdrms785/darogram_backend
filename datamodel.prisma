@@ -42,6 +42,16 @@ type Comment {
   text: String!
   user: User! @relation(name:"CommentsofUser")
   post: Post! @relation(name : "PostAndComment")
+  reply: [Recomment] @relation(name:"ReplyOfComment", onDelete:CASCADE)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+}
+
+type Recomment {
+  id: ID! @id @unique
+  text: String!
+  user: User!
+  parentComment: Comment! @relation(name:"ReplyOfComment") 
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
 }

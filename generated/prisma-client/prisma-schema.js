@@ -27,6 +27,10 @@ type AggregatePost {
   count: Int!
 }
 
+type AggregateRecomment {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -247,6 +251,7 @@ type Comment {
   text: String!
   user: User!
   post: Post!
+  reply(where: RecommentWhereInput, orderBy: RecommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recomment!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -262,6 +267,7 @@ input CommentCreateInput {
   text: String!
   user: UserCreateOneWithoutCommentsInput!
   post: PostCreateOneWithoutCommentsInput!
+  reply: RecommentCreateManyWithoutParentCommentInput
 }
 
 input CommentCreateManyWithoutPostInput {
@@ -274,16 +280,30 @@ input CommentCreateManyWithoutUserInput {
   connect: [CommentWhereUniqueInput!]
 }
 
+input CommentCreateOneWithoutReplyInput {
+  create: CommentCreateWithoutReplyInput
+  connect: CommentWhereUniqueInput
+}
+
 input CommentCreateWithoutPostInput {
   id: ID
   text: String!
   user: UserCreateOneWithoutCommentsInput!
+  reply: RecommentCreateManyWithoutParentCommentInput
+}
+
+input CommentCreateWithoutReplyInput {
+  id: ID
+  text: String!
+  user: UserCreateOneWithoutCommentsInput!
+  post: PostCreateOneWithoutCommentsInput!
 }
 
 input CommentCreateWithoutUserInput {
   id: ID
   text: String!
   post: PostCreateOneWithoutCommentsInput!
+  reply: RecommentCreateManyWithoutParentCommentInput
 }
 
 type CommentEdge {
@@ -381,6 +401,7 @@ input CommentUpdateInput {
   text: String
   user: UserUpdateOneRequiredWithoutCommentsInput
   post: PostUpdateOneRequiredWithoutCommentsInput
+  reply: RecommentUpdateManyWithoutParentCommentInput
 }
 
 input CommentUpdateManyDataInput {
@@ -420,14 +441,29 @@ input CommentUpdateManyWithWhereNestedInput {
   data: CommentUpdateManyDataInput!
 }
 
+input CommentUpdateOneRequiredWithoutReplyInput {
+  create: CommentCreateWithoutReplyInput
+  update: CommentUpdateWithoutReplyDataInput
+  upsert: CommentUpsertWithoutReplyInput
+  connect: CommentWhereUniqueInput
+}
+
 input CommentUpdateWithoutPostDataInput {
   text: String
   user: UserUpdateOneRequiredWithoutCommentsInput
+  reply: RecommentUpdateManyWithoutParentCommentInput
+}
+
+input CommentUpdateWithoutReplyDataInput {
+  text: String
+  user: UserUpdateOneRequiredWithoutCommentsInput
+  post: PostUpdateOneRequiredWithoutCommentsInput
 }
 
 input CommentUpdateWithoutUserDataInput {
   text: String
   post: PostUpdateOneRequiredWithoutCommentsInput
+  reply: RecommentUpdateManyWithoutParentCommentInput
 }
 
 input CommentUpdateWithWhereUniqueWithoutPostInput {
@@ -438,6 +474,11 @@ input CommentUpdateWithWhereUniqueWithoutPostInput {
 input CommentUpdateWithWhereUniqueWithoutUserInput {
   where: CommentWhereUniqueInput!
   data: CommentUpdateWithoutUserDataInput!
+}
+
+input CommentUpsertWithoutReplyInput {
+  update: CommentUpdateWithoutReplyDataInput!
+  create: CommentCreateWithoutReplyInput!
 }
 
 input CommentUpsertWithWhereUniqueWithoutPostInput {
@@ -483,6 +524,9 @@ input CommentWhereInput {
   text_not_ends_with: String
   user: UserWhereInput
   post: PostWhereInput
+  reply_every: RecommentWhereInput
+  reply_some: RecommentWhereInput
+  reply_none: RecommentWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -1214,6 +1258,12 @@ type Mutation {
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   deletePost(where: PostWhereUniqueInput!): Post
   deleteManyPosts(where: PostWhereInput): BatchPayload!
+  createRecomment(data: RecommentCreateInput!): Recomment!
+  updateRecomment(data: RecommentUpdateInput!, where: RecommentWhereUniqueInput!): Recomment
+  updateManyRecomments(data: RecommentUpdateManyMutationInput!, where: RecommentWhereInput): BatchPayload!
+  upsertRecomment(where: RecommentWhereUniqueInput!, create: RecommentCreateInput!, update: RecommentUpdateInput!): Recomment!
+  deleteRecomment(where: RecommentWhereUniqueInput!): Recomment
+  deleteManyRecomments(where: RecommentWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
@@ -1643,10 +1693,240 @@ type Query {
   post(where: PostWhereUniqueInput!): Post
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
+  recomment(where: RecommentWhereUniqueInput!): Recomment
+  recomments(where: RecommentWhereInput, orderBy: RecommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recomment]!
+  recommentsConnection(where: RecommentWhereInput, orderBy: RecommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RecommentConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
+}
+
+type Recomment {
+  id: ID!
+  text: String!
+  user: User!
+  parentComment: Comment!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type RecommentConnection {
+  pageInfo: PageInfo!
+  edges: [RecommentEdge]!
+  aggregate: AggregateRecomment!
+}
+
+input RecommentCreateInput {
+  id: ID
+  text: String!
+  user: UserCreateOneInput!
+  parentComment: CommentCreateOneWithoutReplyInput!
+}
+
+input RecommentCreateManyWithoutParentCommentInput {
+  create: [RecommentCreateWithoutParentCommentInput!]
+  connect: [RecommentWhereUniqueInput!]
+}
+
+input RecommentCreateWithoutParentCommentInput {
+  id: ID
+  text: String!
+  user: UserCreateOneInput!
+}
+
+type RecommentEdge {
+  node: Recomment!
+  cursor: String!
+}
+
+enum RecommentOrderByInput {
+  id_ASC
+  id_DESC
+  text_ASC
+  text_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type RecommentPreviousValues {
+  id: ID!
+  text: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input RecommentScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  text: String
+  text_not: String
+  text_in: [String!]
+  text_not_in: [String!]
+  text_lt: String
+  text_lte: String
+  text_gt: String
+  text_gte: String
+  text_contains: String
+  text_not_contains: String
+  text_starts_with: String
+  text_not_starts_with: String
+  text_ends_with: String
+  text_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [RecommentScalarWhereInput!]
+  OR: [RecommentScalarWhereInput!]
+  NOT: [RecommentScalarWhereInput!]
+}
+
+type RecommentSubscriptionPayload {
+  mutation: MutationType!
+  node: Recomment
+  updatedFields: [String!]
+  previousValues: RecommentPreviousValues
+}
+
+input RecommentSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: RecommentWhereInput
+  AND: [RecommentSubscriptionWhereInput!]
+  OR: [RecommentSubscriptionWhereInput!]
+  NOT: [RecommentSubscriptionWhereInput!]
+}
+
+input RecommentUpdateInput {
+  text: String
+  user: UserUpdateOneRequiredInput
+  parentComment: CommentUpdateOneRequiredWithoutReplyInput
+}
+
+input RecommentUpdateManyDataInput {
+  text: String
+}
+
+input RecommentUpdateManyMutationInput {
+  text: String
+}
+
+input RecommentUpdateManyWithoutParentCommentInput {
+  create: [RecommentCreateWithoutParentCommentInput!]
+  delete: [RecommentWhereUniqueInput!]
+  connect: [RecommentWhereUniqueInput!]
+  set: [RecommentWhereUniqueInput!]
+  disconnect: [RecommentWhereUniqueInput!]
+  update: [RecommentUpdateWithWhereUniqueWithoutParentCommentInput!]
+  upsert: [RecommentUpsertWithWhereUniqueWithoutParentCommentInput!]
+  deleteMany: [RecommentScalarWhereInput!]
+  updateMany: [RecommentUpdateManyWithWhereNestedInput!]
+}
+
+input RecommentUpdateManyWithWhereNestedInput {
+  where: RecommentScalarWhereInput!
+  data: RecommentUpdateManyDataInput!
+}
+
+input RecommentUpdateWithoutParentCommentDataInput {
+  text: String
+  user: UserUpdateOneRequiredInput
+}
+
+input RecommentUpdateWithWhereUniqueWithoutParentCommentInput {
+  where: RecommentWhereUniqueInput!
+  data: RecommentUpdateWithoutParentCommentDataInput!
+}
+
+input RecommentUpsertWithWhereUniqueWithoutParentCommentInput {
+  where: RecommentWhereUniqueInput!
+  update: RecommentUpdateWithoutParentCommentDataInput!
+  create: RecommentCreateWithoutParentCommentInput!
+}
+
+input RecommentWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  text: String
+  text_not: String
+  text_in: [String!]
+  text_not_in: [String!]
+  text_lt: String
+  text_lte: String
+  text_gt: String
+  text_gte: String
+  text_contains: String
+  text_not_contains: String
+  text_starts_with: String
+  text_not_starts_with: String
+  text_ends_with: String
+  text_not_ends_with: String
+  user: UserWhereInput
+  parentComment: CommentWhereInput
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [RecommentWhereInput!]
+  OR: [RecommentWhereInput!]
+  NOT: [RecommentWhereInput!]
+}
+
+input RecommentWhereUniqueInput {
+  id: ID
 }
 
 type Subscription {
@@ -1656,6 +1936,7 @@ type Subscription {
   like(where: LikeSubscriptionWhereInput): LikeSubscriptionPayload
   message(where: MessageSubscriptionWhereInput): MessageSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
+  recomment(where: RecommentSubscriptionWhereInput): RecommentSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
